@@ -1,27 +1,30 @@
-package cwchain;
+package block01;
+
+
+
 import java.util.ArrayList;
 import com.google.gson.GsonBuilder;
 
 public class CwChain {
 	
 	public static ArrayList<Block> blockchain = new ArrayList<Block>();
-	public static int difficulty = 5;
+	public static int difficulty = 3;
 
 	public static void main(String[] args) {	
 		//add our blocks to the blockchain ArrayList:
 		
-		System.out.println("Trying to Mine block 1... ");
-		addBlock(new Block("Hi im the first block", "0"));
+		System.out.println("Mining block 1... ");
+		addBlock(new Block("first block", "0"));
 		
-		System.out.println("Trying to Mine block 2... ");
-		addBlock(new Block("Yo im the second block",blockchain.get(blockchain.size()-1).hash));
+		System.out.println("Mining block 2... ");
+		addBlock(new Block("second block",blockchain.get(blockchain.size()-1).hash));
 		
-		System.out.println("Trying to Mine block 3... ");
-		addBlock(new Block("Hey im the third block",blockchain.get(blockchain.size()-1).hash));	
+		System.out.println("Mining block 3... ");
+		addBlock(new Block("third block",blockchain.get(blockchain.size()-1).hash));	
 		
 		System.out.println("\nBlockchain is Valid: " + isChainValid());
 		
-		String blockchainJson = StringUtil.getJson(blockchain);
+		String blockchainJson = BlockUtil.getJson(blockchain);
 		System.out.println("\nThe block chain: ");
 		System.out.println(blockchainJson);
 	}

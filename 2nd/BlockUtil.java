@@ -1,10 +1,13 @@
-package cwchain;
+package BlockChain02;
+
 import java.security.*;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
+
 import com.google.gson.GsonBuilder;
 
-public class StringUtil {
+public class BlockUtil {
 	
 	//Applies Sha256 to a string and returns the result. 
 	public static String applySha256(String input){
@@ -63,7 +66,7 @@ public class StringUtil {
 	}
 	
 	//Returns difficulty string target, to compare to hash. eg difficulty of 5 will return "00000"  
-	public static String getDificultyString(int difficulty) {
+	public static String getDifficultyString(int difficulty) {
 		return new String(new char[difficulty]).replace('\0', '0');
 	}
 	

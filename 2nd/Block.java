@@ -1,61 +1,59 @@
-package cwchain;
+package BlockChain02;
 
 import java.util.ArrayList;
 import java.util.Date;
 
+//1. 항목이 있어야한다.
+//2. 항목의 기능이 있어야 한다.
 public class Block {
 	
-	public String hash;
-	public String previousHash; 
+	public String hash; //"0000157", 인간의 지문(고유한키값)
+	public String previousHash ;// 123 이전 인간에 대한 지문값
+	public String data; //값을 담는 부분 전송내역...
+	public int nonce; //1000,1221 random
+	public long timeStamp;//12.2
 	public String merkleRoot;
-	public ArrayList<Transaction> transactions = new ArrayList<Transaction>(); //our data will be a simple message.
-	public long timeStamp; //as number of milliseconds since 1/1/1970.
-	public int nonce;
 	
-	//Block Constructor.  
-	public Block(String previousHash ) {
-		this.previousHash = previousHash;
-		this.timeStamp = new Date().getTime();
-		
-		this.hash = calculateHash(); //Making sure we do this after we set the other values.
+	public ArrayList<Transaction> transactionList = new ArrayList<>();
+	
+	
+    
+	public Block( String preHash) {
+    	this.previousHash =preHash;
+    	this.timeStamp = new Date().getTime();//20190210121212
+    	this.hash = calculateHash();
 	}
-	
-	//Calculate new hash based on blocks contents
-	public String calculateHash() {
-		String calculatedhash = StringUtil.applySha256( 
-				previousHash +
-				Long.toString(timeStamp) +
-				Integer.toString(nonce) + 
-				merkleRoot
-				);
-		return calculatedhash;
-	}
-	
-	//Increases nonce value until hash target is reached.
-	public void mineBlock(int difficulty) {
-		merkleRoot = StringUtil.getMerkleRoot(transactions);
-		String target = StringUtil.getDificultyString(difficulty); //Create a string with difficulty * "0" 
-		while(!hash.substring( 0, difficulty).equals(target)) {
-			nonce ++;
-			hash = calculateHash();
-		}
-		System.out.println("Block Mined!!! : " + hash);
-	}
-	
-	//Add transactions to this block
-	public boolean addTransaction(Transaction transaction) {
-		//process transaction and check if valid, unless block is genesis block then ignore.
-		if(transaction == null) return false;		
-		if((previousHash != "0")) {
-			if((transaction.processTransaction() != true)) {
-				System.out.println("Transaction failed to process. Discarded.");
-				return false;
-			}
-		}
 
-		transactions.add(transaction);
-		System.out.println("Transaction Successfully added to Block");
-		return true;
-	}
+
+	public String calculateHash() {
+    	String hash= BlockUtil.applySha256(previousHash+Long.toString(timeStamp)+Integer.toString(nonce)+merkleRoot);
+    	return hash;
+    }
+    
+    public void mineBlock(int diff) {
+    	merkleRoot = BlockUtil.getMerkleRoot(transactionList);
+    	String target = BlockUtil.getDifficultyString(diff);//2이면 앞자리가 00
+    	while(!hash.substring(0,diff).equals(target)) {
+    		nonce++;
+    		hash = calculateHash();
+//    	  	System.out.println("target: "+target+" hash: "+hash+" nonce: "+nonce);
+    	}
+//    	System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$Mined hash: "+hash+" nonce: "+nonce);
+    	
+    }
+    
+    public boolean addTransaction(Transaction tx) {
+    	if(tx == null) return false;
+    	if(previousHash != "0") {
+    		if(tx.processTransaction() != true) {
+    			return false;
+    		}
+    	}
+    	transactionList.add(tx);
+    	return true;
+    }
 	
+	
+	
+
 }

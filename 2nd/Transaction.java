@@ -1,22 +1,22 @@
-package cwchain;
-import java.security.*;
+package BlockChain02;
+
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.ArrayList;
 
 public class Transaction {
+	public String transactionId;
+	public PublicKey sender;
+	public PublicKey reciepient;
+	public float value;
+	public byte[] signature;
 	
-	public String transactionId; //Contains a hash of transaction*
-	public PublicKey sender; //Senders address/public key.
-	public PublicKey reciepient; //Recipients address/public key.
-	public float value; //Contains the amount we wish to send to the recipient.
-	public byte[] signature; //This is to prevent anybody else from spending funds in our wallet.
+	public ArrayList<TransactionInput> inputs = new ArrayList<>();
+	public ArrayList<TransactionOutput> outputs = new ArrayList<>();
 	
-	public ArrayList<TransactionInput> inputs = new ArrayList<TransactionInput>();
-	public ArrayList<TransactionOutput> outputs = new ArrayList<TransactionOutput>();
+	public static int sequence =0;
 	
-	private static int sequence = 0; //A rough count of how many transactions have been generated 
-	
-	// Constructor: 
-	public Transaction(PublicKey from, PublicKey to, float value,  ArrayList<TransactionInput> inputs) {
+	public Transaction(PublicKey from, PublicKey to, float value, ArrayList<TransactionInput> inputs) {
 		this.sender = from;
 		this.reciepient = to;
 		this.value = value;
@@ -25,75 +25,69 @@ public class Transaction {
 	
 	public boolean processTransaction() {
 		
-		if(verifySignature() == false) {
-			System.out.println("#Transaction Signature failed to verify");
-			return false;
-		}
-				
-		//Gathers transaction inputs (Making sure they are unspent):
-		for(TransactionInput i : inputs) {
-			i.UTXO = NoobChain.UTXOs.get(i.transactionOutputId);
-		}
-
-		//Checks if transaction is valid:
-		if(getInputsValue() < NoobChain.minimumTransaction) {
-			System.out.println("Transaction Inputs to small: " + getInputsValue());
+		//1.verifySignature()
+		if(verifySignature()==false) {
 			return false;
 		}
 		
-		//Generate transaction outputs:
-		float leftOver = getInputsValue() - value; //get value of inputs then the left over change:
-		transactionId = calulateHash();
-		outputs.add(new TransactionOutput( this.reciepient, value,transactionId)); //send value to recipient
-		outputs.add(new TransactionOutput( this.sender, leftOver,transactionId)); //send the left over 'change' back to sender		
-				
-		//Add outputs to Unspent list
+		//2. 메인함수에 임시 저장된 txoutId로 UTXO(사용되지 않은게 맞냐? 확인)
+		for(TransactionInput i :inputs) {
+			i.UTXO = Main.UTXOs.get(i.transactionOutputId);
+		}
+		
+		//3. 최소단위 0.1f 를 넘는지 체크
+		if(getInputValue() < Main.mininmumTransaction) {
+			return false;
+		}
+		
+		//4. TxOutput 100 value: 40,60
+		float leftOver = getInputValue()-value;
+		
+		transactionId = calculateHash();
+		//40코인 송신
+		outputs.add(new TransactionOutput(this.reciepient, value, transactionId));
+		//나머지 60
+		outputs.add(new TransactionOutput(this.sender, leftOver, transactionId));
+		
+		
+		//5. output to Unspent list
 		for(TransactionOutput o : outputs) {
-			NoobChain.UTXOs.put(o.id , o);
+			Main.UTXOs.put(o.id, o);
 		}
 		
-		//Remove transaction inputs from UTXO lists as spent:
+		// 6. remove Txinput
 		for(TransactionInput i : inputs) {
-			if(i.UTXO == null) continue; //if Transaction can't be found skip it 
-			NoobChain.UTXOs.remove(i.UTXO.id);
+			if(i.UTXO == null)continue;
+			Main.UTXOs.remove(i.UTXO.id);
 		}
-		
+	
 		return true;
 	}
 	
-	public float getInputsValue() {
-		float total = 0;
+	public String calculateHash() {
+		sequence++;
+		return BlockUtil.applySha256(BlockUtil.getStringFromKey(sender)+ 
+				BlockUtil.getStringFromKey(reciepient)+
+				Float.toString(value)+sequence);
+	}
+	
+	public float getInputValue() {
+		float total=0;
 		for(TransactionInput i : inputs) {
-			if(i.UTXO == null) continue; //if Transaction can't be found skip it, This behavior may not be optimal.
+			if(i.UTXO == null) continue;
 			total += i.UTXO.value;
 		}
 		return total;
 	}
 	
-	public void generateSignature(PrivateKey privateKey) {
-		String data = StringUtil.getStringFromKey(sender) + StringUtil.getStringFromKey(reciepient) + Float.toString(value)	;
-		signature = StringUtil.applyECDSASig(privateKey,data);		
-	}
-	
 	public boolean verifySignature() {
-		String data = StringUtil.getStringFromKey(sender) + StringUtil.getStringFromKey(reciepient) + Float.toString(value)	;
-		return StringUtil.verifyECDSASig(sender, data, signature);
+		String data = BlockUtil.getStringFromKey(sender)+BlockUtil.getStringFromKey(reciepient)+Float.toString(value);
+		return BlockUtil.verifyECDSASig(sender, data, signature);
 	}
-	
-	public float getOutputsValue() {
-		float total = 0;
-		for(TransactionOutput o : outputs) {
-			total += o.value;
-		}
-		return total;
+	public void generateSignature(PrivateKey privateKey) {
+		String data = BlockUtil.getStringFromKey(sender)+BlockUtil.getStringFromKey(reciepient)+Float.toString(value);
+		signature = BlockUtil.applyECDSASig(privateKey, data);
+		
 	}
-	
-	private String calulateHash() {
-		sequence++; //increase the sequence to avoid 2 identical transactions having the same hash
-		return StringUtil.applySha256(
-				StringUtil.getStringFromKey(sender) +
-				StringUtil.getStringFromKey(reciepient) +
-				Float.toString(value) + sequence
-				);
-	}
+
 }

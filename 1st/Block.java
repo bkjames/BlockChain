@@ -32,7 +32,7 @@ public class Block {
 	
 	//Increases nonce value until hash target is reached.
 	public void mineBlock(int difficulty) {
-		String target = StringUtil.getDificultyString(difficulty); //Create a string with difficulty * "0" 
+		String target = StringUtil.getDifficultyString(difficulty); //Create a string with difficulty * "0" 
 		while(!hash.substring( 0, difficulty).equals(target)) {
 			nonce ++;
 			hash = calculateHash();

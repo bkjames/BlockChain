@@ -47,18 +47,12 @@ public class Main {
 		System.out.println("block1 add 후 "+walletA.getBalance());
 		addBlock(block1);
 	
-		
-		
-
-
-	
 	}
 	
 	public static void addBlock(Block newBlock) {
 		newBlock.mineBlock(difficulty);
 		blockChain.add(newBlock);
 	}
-	
 
 
 }

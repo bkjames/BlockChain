@@ -1,11 +1,9 @@
-package BlockChain02;
-
+package Part2;
 import java.security.*;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.List;
-
 import com.google.gson.GsonBuilder;
+import java.util.List;
 
 public class BlockUtil {
 	
@@ -15,7 +13,7 @@ public class BlockUtil {
 		try {
 			MessageDigest digest = MessageDigest.getInstance("SHA-256");
 	        
-			//Applies sha256 to our input, 
+			
 			byte[] hash = digest.digest(input.getBytes("UTF-8"));
 	        
 			StringBuffer hexString = new StringBuffer(); // This will contain hash as hexidecimal

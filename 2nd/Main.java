@@ -1,4 +1,6 @@
-package BlockChain02;
+package Part2;
+
+import java.util.ArrayList;
 
 import java.security.Security;
 import java.util.ArrayList;
@@ -15,10 +17,11 @@ public class Main {
 	public static Wallet walletA;
 	public static Wallet walletB;
 	public static Transaction genesisTransaction;
-	public static float mininmumTransaction =0.1f;
-	
+	public static float minimumTransaction =0.1f;
+						
 	public static void main(String[] args) {
-		System.out.println("test\n");
+	
+		
 		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
 		//1. 지갑 생성
 		walletA = new Wallet();
@@ -37,15 +40,18 @@ public class Main {
 		Block genesisBlock = new Block("0"); 
 		genesisBlock.addTransaction(genesisTransaction);
 		addBlock(genesisBlock);
-		
-		//5.다음 블록 생성
+		System.out.println("");
+				
+		//5.다음 블록(Block1) 생성
 		Block block1 = new Block(genesisBlock.hash);
-		System.out.println("first "+walletA.getBalance());
-		Transaction tx = walletA.sendFunds(walletB.publicKey, 40f);
-		System.out.println("block1 add 전 "+walletA.getBalance());
-		block1.addTransaction(tx);
-		System.out.println("block1 add 후 "+walletA.getBalance());
+		System.out.println("1. walletA.getBalance(): "+walletA.getBalance());
+		System.out.println("2. block1 add 전 "+walletA.getBalance());
+		
+		block1.addTransaction(walletA.sendFunds(walletB.publicKey, 40f));
 		addBlock(block1);
+		System.out.println("3. walletA.getBalance(): "+walletA.getBalance());
+		System.out.println("4. walletB.getBalance(): "+walletB.getBalance());
+
 	
 	}
 	

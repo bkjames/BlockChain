@@ -1,13 +1,10 @@
-package BlockChain02;
+package Part2;
 
 public class TransactionInput {
-	
-	public String transactionOutputId;
-	public TransactionOutput UTXO;
+	public String transactionOutputId; // TransactionOutputs -> transactionId
+	public TransactionOutput UTXO; //Unspent transaction output
 	
 	public TransactionInput(String transactionOutputId) {
 		this.transactionOutputId = transactionOutputId;
 	}
-	
-
 }

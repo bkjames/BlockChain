@@ -1,4 +1,6 @@
-package BlockChain02;
+package Part2;
+
+import java.util.Date;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,17 +41,19 @@ public class Block {
 //    	  	System.out.println("target: "+target+" hash: "+hash+" nonce: "+nonce);
     	}
 //    	System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$Mined hash: "+hash+" nonce: "+nonce);
+    	System.out.println("===Block Mined!!! : " + hash);
     	
     }
     
     public boolean addTransaction(Transaction tx) {
     	if(tx == null) return false;
-    	if(previousHash != "0") {
+    	if((!"0".equals(previousHash))) {
     		if(tx.processTransaction() != true) {
     			return false;
     		}
     	}
     	transactionList.add(tx);
+    	System.out.println("===Transaction added to Block");
     	return true;
     }
 	

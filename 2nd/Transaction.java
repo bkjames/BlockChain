@@ -1,4 +1,4 @@
-package BlockChain02;
+package Part2;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -36,7 +36,7 @@ public class Transaction {
 		}
 		
 		//3. 최소단위 0.1f 를 넘는지 체크
-		if(getInputValue() < Main.mininmumTransaction) {
+		if(getInputValue() < Main.minimumTransaction) {
 			return false;
 		}
 		
